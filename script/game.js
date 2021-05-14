@@ -36,7 +36,7 @@ const sprite = new Image();
 sprite.src = "images/sprite.png";
 
 
-    document.addEventListener("click",function(e){
+    document.addEventListener("click",function(evt){
         switch(STATE.current){
           case STATE.getReady:
                 STATE.current=STATE.game;
@@ -45,15 +45,25 @@ sprite.src = "images/sprite.png";
                 bird.flap();
                 break;
             case STATE.over:
-                STATE.getReady;
-                break;
+                let rect = canvas.getBoundingClientRect();
+            let clickX = evt.clientX - rect.left;
+            let clickY = evt.clientY - rect.top;
+            
+            // CHECK IF WE CLICK ON THE START BUTTON
+            if(clickX >= startBtn.x && clickX <= startBtn.x + startBtn.w && clickY >= startBtn.y && clickY <= startBtn.y + startBtn.h){
+                pipes.reset();
+                bird.speedReset();
+                score.reset();
+                STATE.current = STATE.game;
+            }
+            break;
 
         } 
 
     })
     document.addEventListener("keypress",function(e){
         
-                if(e.keyCode===32)
+                if(e)
                  {
                     switch(STATE.current){
                         case STATE.game:
@@ -215,11 +225,15 @@ class Bird{
 
     draw(frames)
     {   
-       // ctx.save();
-       // ctx.translate(this.xpos,this.ypos)  ;
-        // ctx.rotate(this.rotation);
-         ctx.drawImage(bird_image[this.frame%4],this.xpos,this.ypos,36,36);
-       // ctx.restore();
+        let bird = bird_image[this.frame];
+ 
+  
+        ctx.save();
+        ctx.translate(this.xpos,this.ypos)  ;
+        ctx.rotate(this.rotation);
+         ctx.drawImage(bird_image[this.frame%4],-36/2,-36/2,36,36);
+        ctx.restore();
+ 
         }
 
     flap()
@@ -231,7 +245,9 @@ class Bird{
     update(frames)
     {
         if(STATE.current==STATE.getReady){
-               // this.rotation=0*DEGREE;
+             this.ypos=1/3*GAME_HEIGHT;
+             this.rotation = 0 * DEGREE;
+
         }
         else{
         this.speed+=this.gravity;
@@ -244,10 +260,10 @@ class Bird{
             }
         }
         if(this.speed>=this.jump){
-         //   this.rotation=0*DEGREE;
+           this.rotation=90*DEGREE;
         }
         else{
-           // this.rotation=-0*DEGREE;
+            this.rotation=-25*DEGREE;
         }
     }
        
@@ -263,18 +279,24 @@ const getReady={
         ctx.font="30px Calibri";
         ctx.fillText("Tap to Start",110,300);
         ctx.fillText("Space to Play",90,350);
-        ctx.textAlign
-    }
+     }
 }
 
 }
 
 const over={    
+    sX : 175,
+    sY : 228,
+    w : 225,
+    h : 202,
+    x : canvas.width/2 - 225/2,
+    y : 90,
+    
     draw: function(){
-        if(STATE.current==STATE.over){
-        ctx.font="30px Calibri";
-        ctx.fillText("GAME OVER",110,300);
-    }}
+        if(STATE.current == STATE.over){
+            ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);   
+        }
+    }
 }
 
 const score= {
@@ -323,16 +345,17 @@ var bird= new Bird();
 
 function draw(frames)
 {
-    
+    over.draw();
+
     ctx.clearRect(0,0,GAME_WIDTH,GAME_HEIGHT);
     background.draw();
     pipes.draw();
-
     foreground.draw();
     bird.draw();
     getReady.draw();
     over.draw();
     score.draw();
+    
   
  }
 function update(frames){
@@ -347,7 +370,7 @@ function loop()
     update(frames);
     draw(frames);
     frames++;
-    requestAnimationFrame(loop)
+    requestAnimationFrame(loop);
 }
 loop();
  
