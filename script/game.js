@@ -33,7 +33,7 @@ const bird_image=[];
 
 
 const sprite = new Image();
-sprite.src = "img/sprite.png";
+sprite.src = "images/sprite.png";
 
 
     document.addEventListener("click",function(e){
@@ -263,6 +263,7 @@ const getReady={
         ctx.font="30px Calibri";
         ctx.fillText("Tap to Start",110,300);
         ctx.fillText("Space to Play",90,350);
+        ctx.textAlign
     }
 }
 
